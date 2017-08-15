@@ -17,9 +17,7 @@ if ! [ -d $srcdir ]; then
 mkdir $srcdir
 fi
 
-if ! [ -f ${pkgname}-${pkgver}.tar.gz ]; then
-curl -LO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${pkgname}/${pkgname}-${pkgver}.tar.gz
-fi
+wget -N https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${pkgname}/${pkgname}-${pkgver}.tar.gz
 tar xvzf ${pkgname}-${pkgver}.tar.gz -C $srcdir
 
 cd $srcdir
