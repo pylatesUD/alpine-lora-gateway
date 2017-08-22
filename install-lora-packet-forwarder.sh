@@ -12,7 +12,11 @@ git clone https://github.com/pylatesUD/packet_forwarder
 cd packet_forwarder
 git checkout ftdi
 make
-cd ..
+cd basic_pkt_fwd/
+mac=$(cat /sys/class/net/eth0/address | sed -e 's/://g')
+eui="${mac:0:7}FFFE${mac: -6}"
+sed -ie "s/AA555A003A0581D1/$eui/g" local_conf.json
+cd ../..
 cp -ar packet_forwarder/ /opt/
 cd ..
 
