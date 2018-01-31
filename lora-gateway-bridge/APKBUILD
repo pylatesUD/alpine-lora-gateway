@@ -1,0 +1,34 @@
+# Contributor: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
+# Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
+pkgname=lora-gateway-bridge
+pkgver=
+pkgrel=0
+pkgdesc=""
+url=""
+arch="all"
+license=""
+depends=""
+makedepends=""
+install="$pkgname.pre-install $pkgname.post-install"
+subpackages="$pkgname-dev $pkgname-doc"
+source="
+	lora-gateway-bridge.initd
+	lora-gateway-bridge.confd
+	"
+builddir="$srcdir/"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+
+	install -m755 -D "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="512331fd6b4c5621c14b8bf07a94b2318dc33fea245de1e66d6385e1dc4cbfde7cb0d53507b46c85a11defe65a936cca40ace80df76130c7af2ef5999899892c  lora-gateway-bridge.initd
+f11f0d192cd7823307c2ce4ddc7b3fff5190f72d3f65a5524b487021a95a222aca1fd36ab1eb58ed533e7acd555bfb70f0c8a13db20338ea31527f3151fd2bd7  lora-gateway-bridge.confd"

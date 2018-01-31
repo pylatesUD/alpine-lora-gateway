@@ -1,0 +1,85 @@
+# Contributor: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
+# Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
+## TODO: actualize to the latest build when they changes non-standard qsort_r with qsort in lora_pkt_fwd/src/jitqueue.c
+
+pkgname=lora-packet-forwarder
+altname=packet-forwarder
+pkgver=2.2.1
+pkgrel=0
+pkgdesc="a program for a LoRa gateway that forwards packets received to a server and emits packets that are sent by the server."
+url="https://github.com/Lora-net/packet_forwarder"
+arch="armhf"
+license="custom"
+depends="lora-gateway-dev"
+makedepends=""
+install="$pkgname.pre-install $pkgname.post-install"
+subpackages="$pkgname-dev $pkgname-doc"
+source="
+        ${pkgname}-${pkgver}.tar.gz::https://github.com/Lora-net/packet_forwarder/archive/v$pkgver.tar.gz
+	10-makefile.patch
+	lora-packet-forwarder.initd
+	lora-packet-forwarder.confd
+	"
+builddir="$srcdir/"
+options="!check"
+
+prepare() {
+	patch "$builddir"/${altname/-/_}-${pkgver}/Makefile < 10-makefile.patch
+}
+build() {
+	cd "$builddir"/${altname/-/_}-${pkgver}/
+	unset CFLAGS
+	unset CPPFLAGS
+	make
+}
+
+package() {
+	cd "$builddir/${altname/-/_}-$pkgver/"
+	mkdir -p "$pkgdir"/usr/include/$pkgname
+	cp -ar . "$pkgdir"/usr/include/$pkgname
+	cd "$pkgdir"/usr/include/$pkgname
+
+	install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+	rm LICENSE
+
+	mkdir -p "$pkgdir"/usr/share/doc/$pkgname
+	find . -name readme.md -exec cp --parents '{}' "$pkgdir"/usr/share/doc/$pkgname/ \; -delete
+
+	install -Dm644 PROTOCOL.TXT "$pkgdir"/usr/share/doc/$pkgname/PROTOCOL.TXT
+	rm PROTOCOL.TXT
+
+	install -m555 -D ./reset_pkt_fwd.sh "$pkgdir"/usr/sbin/reset_pkt_fwd
+	install -m555 -D ./util_ack/util_ack "$pkgdir"/usr/sbin/util_packet_forwarder_ack
+	install -m555 -D ./util_sink/util_sink "$pkgdir"/usr/sbin/util_packet_forwarder_sink
+	install -m555 -D ./util_tx_test/util_tx_test "$pkgdir"/usr/sbin/util_packet_forwarder_tx_test
+
+	cd basic_pkt_fwd
+	install -m555 -D basic_pkt_fwd   "$pkgdir"/usr/sbin/basic_pkt_fwd/basic_pkt_fwd
+	install -m644 -D  global_conf.json local_conf.json "$pkgdir"/usr/sbin/basic_pkt_fwd/
+	cp -r cfg "$pkgdir"/usr/sbin/basic_pkt_fwd/
+	cd ..
+
+	cd beacon_pkt_fwd
+	install -m555 -D beacon_pkt_fwd   "$pkgdir"/usr/sbin/beacon_pkt_fwd/beacon_pkt_fwd
+	install -m644 -D  global_conf.json local_conf.json "$pkgdir"/usr/sbin/beacon_pkt_fwd/
+	cp -r cfg "$pkgdir"/usr/sbin/beacon_pkt_fwd/
+	cd ..
+
+	cd gps_pkt_fwd
+	install -m555 -D gps_pkt_fwd   "$pkgdir"/usr/sbin/gps_pkt_fwd/gps_pkt_fwd
+	install -m644 -D  global_conf.json local_conf.json "$pkgdir"/usr/sbin/gps_pkt_fwd/
+	cp -r cfg "$pkgdir"/usr/sbin/gps_pkt_fwd/
+	cd ..
+
+	make clean 
+
+	install -m755 -D "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="917abb284e885d63aeeefdcaa9097943d9713e20fefbd5205b23b0a3d62ad65e73f5de9f8179fe5084922ac3b14dfc9c0156eff962859644b5c43faff1af07ea  lora-packet-forwarder-2.2.1.tar.gz
+ec3b112a6748cf3919264c814605f8b077a1d7984d491ce44e08fe251ea5cf8e5dfcf320a6db3a4145adc91acd52a5d4b68f9e72244f369409a2abaa522208e5  10-makefile.patch
+9c9d2a7a952c9bc8fe9120fb168c579a5a2e7cf8ce4be81fa20925a07475094cccb75a6fef81a5479ce4dc52281c3756378b7111fe42408f387fd5971171a0be  lora-packet-forwarder.initd
+f11f0d192cd7823307c2ce4ddc7b3fff5190f72d3f65a5524b487021a95a222aca1fd36ab1eb58ed533e7acd555bfb70f0c8a13db20338ea31527f3151fd2bd7  lora-packet-forwarder.confd"

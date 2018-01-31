@@ -1,0 +1,6 @@
+#!/bin/sh
+
+pkgname=lora-gateway
+
+ln -fs /usr/lib/$pkgname/libloragw/libloragw.a /usr/include/$pkgname/libloragw/
+

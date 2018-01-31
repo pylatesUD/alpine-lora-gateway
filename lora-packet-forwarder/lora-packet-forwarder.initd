@@ -1,0 +1,41 @@
+#!/sbin/openrc-run
+
+# Copyright 2018 Sebastian Tabares
+# Distributed under the terms of the GNU General Public License v3
+# $Header: $
+name=basic_pkt_fwd
+desc="Packet Forwarder"
+pkg=packet-forwarder
+dir="/usr/sbin/$name/"
+command="$name"
+#command_args="$sample_opts"
+#command_background="yes"
+
+start_stop_daemon_args="--user $sample_user:$sample_group"
+pidfile="/run/$name.pid"
+
+cd $dir
+
+depend() {
+  need net
+  after firewall
+}
+
+start() {
+  ebegin "Starting $desc"
+  start-stop-daemon --background --start \
+  --exec ./$command \
+  --make-pidfile --pidfile /var/run/$pkg.pid \
+  -1 /var/log/lora/$pkg.log \
+  -2 /var/log/lora/$pkg.errors
+  eend $?
+}
+
+stop() {
+  ebegin "Stopping $desc"
+  start-stop-daemon --stop \
+  -x ./$command \
+  --pidfile /var/run/$pkg.pid
+  eend $?
+}
+

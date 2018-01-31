@@ -1,0 +1,10 @@
+--- Makefile
++++ Makefile.new
+@@ -1,6 +1,6 @@
+ ### Environment constants 
+ 
+-LGW_PATH ?= ../../lora_gateway/libloragw
++LGW_PATH ?= /usr/include/lora-gateway/libloragw
+ ARCH ?=
+ CROSS_COMPILE ?=
+ export
