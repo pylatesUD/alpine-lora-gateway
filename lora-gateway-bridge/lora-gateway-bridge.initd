@@ -1,16 +1,59 @@
 #!/sbin/openrc-run
 
-# Sample init.d file for alpine linux.
-
-name=
+# Copyright 2018 Sebastian Tabares
+# Distributed under the terms of the GNU General Public License v3
+# $Header: $
+name=lora-gateway-bridge
+desc="LoRa Gateway Bridge"
+pkg=$name
 command="/usr/sbin/$name"
-command_args="$sample_opts"
-command_background="yes"
+#command_args="$sample_opts"
+#command_background="yes"
 
 start_stop_daemon_args="--user $sample_user:$sample_group"
 pidfile="/run/$name.pid"
 
 depend() {
-	need net
-	after firewall
+  need net
+  after firewall
+}
+
+start() {
+  ebegin "Starting $desc"
+  start-stop-daemon --background --start \
+  --exec $command \
+  --make-pidfile --pidfile /var/run/$pkg.pid \
+  -1 /var/log/lora/$pkg.log \
+  -2 /var/log/lora/$pkg.errors
+  eend $?
+}
+
+stop() {
+  ebegin "Stopping $desc"
+  start-stop-daemon --stop \
+  -x $command \
+  --pidfile /var/run/$pkg.pid
+  eend $?
+}
+
+restart() {
+  ebegin "Restarting $desc"
+  start-stop-daemon --stop -x $command --pidfile /var/run/$pkg.pid --retry 30
+  start-stop-daemon --background --start \
+  --exec $command \
+  --make-pidfile --pidfile /var/run/$pkg.pid \
+  -1 /var/log/lora/$pkg.log \
+  -2 /var/log/lora/$pkg.errors
+  eend $?
+}
+
+status() {
+	ebegin "Status for $desc:"
+	if [ -f $pidfile ]; then
+        ps -ef $(cat $pidfile)
+        RETVAL=$?
+    else
+        echo "$name is not running"
+    fi
+	eend $?
 }

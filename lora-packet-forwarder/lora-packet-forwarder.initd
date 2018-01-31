@@ -39,3 +39,24 @@ stop() {
   eend $?
 }
 
+restart() {
+  ebegin "Restarting $desc"
+  start-stop-daemon --stop -x ./$command --pidfile /var/run/$pkg.pid --retry 30
+  start-stop-daemon --background --start \
+  --exec ./$command \
+  --make-pidfile --pidfile /var/run/$pkg.pid \
+  -1 /var/log/lora/$pkg.log \
+  -2 /var/log/lora/$pkg.errors
+  eend $?
+}
+
+status() {
+	ebegin "Status for $desc:"
+	if [ -f $pidfile ]; then
+        ps -ef $(cat $pidfile)
+        RETVAL=$?
+    else
+        echo "$name is not running"
+    fi
+	eend $?
+}

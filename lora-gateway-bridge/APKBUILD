@@ -1,28 +1,33 @@
 # Contributor: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 # Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 pkgname=lora-gateway-bridge
-pkgver=
+pkgver=2.2.0
 pkgrel=0
-pkgdesc=""
-url=""
-arch="all"
-license=""
+pkgdesc="LoRa Gateway Bridge abstracts the packet_forwarder protocol into JSON over MQTT"
+url="https://docs.loraserver.io/lora-gateway-bridge/overview/"
+arch="armhf"
+license="MIT"
 depends=""
 makedepends=""
 install="$pkgname.pre-install $pkgname.post-install"
-subpackages="$pkgname-dev $pkgname-doc"
+#subpackages="$pkgname-dev $pkgname-doc"
 source="
+	https://github.com/brocaar/${pkgname}/releases/download/$pkgver/${pkgname//-/_}_${pkgver}_linux_arm.tar.gz
 	lora-gateway-bridge.initd
 	lora-gateway-bridge.confd
 	"
 builddir="$srcdir/"
+options="!check"
 
 build() {
 	cd "$builddir"
+
 }
 
 package() {
 	cd "$builddir"
+
+	install -m755 -D $pkgname "$pkgdir"/usr/sbin/$pkgname
 
 	install -m755 -D "$srcdir"/$pkgname.initd \
 		"$pkgdir"/etc/init.d/$pkgname
@@ -30,5 +35,6 @@ package() {
 		"$pkgdir"/etc/conf.d/$pkgname
 }
 
-sha512sums="512331fd6b4c5621c14b8bf07a94b2318dc33fea245de1e66d6385e1dc4cbfde7cb0d53507b46c85a11defe65a936cca40ace80df76130c7af2ef5999899892c  lora-gateway-bridge.initd
-f11f0d192cd7823307c2ce4ddc7b3fff5190f72d3f65a5524b487021a95a222aca1fd36ab1eb58ed533e7acd555bfb70f0c8a13db20338ea31527f3151fd2bd7  lora-gateway-bridge.confd"
+sha512sums="996647ba71bb026444fbae198aef19637d306f6a6662e60fdb69fa4add0edd7b0baecd1153b5f6a7b22ec1eae0bb18c775159019632c96a4036b9f0aa755122d  lora_gateway_bridge_2.2.0_linux_arm.tar.gz
+0aab3ac3f6c99cd5bd64d2eb4c128641f4e475355ef28ea3d4186afe19f02ec45a52fcf0eeeacc7ce46d7186adb2220ecc3eb33173364553ee5d851a62280132  lora-gateway-bridge.initd
+07b14e2d5ea2860d0fe10af3554d1ce5a50ccc913d07a06290df46d8b28b663411dee4ee7375afbe473f99ac0e61393996af7ec9dd4cdf92e5f2013d24c81f6b  lora-gateway-bridge.confd"
