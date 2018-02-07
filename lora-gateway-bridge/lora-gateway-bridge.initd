@@ -11,7 +11,7 @@ command="/usr/sbin/$name"
 #command_background="yes"
 
 start_stop_daemon_args="--user $sample_user:$sample_group"
-pidfile="/run/$name.pid"
+pidfile="/var/run/$name.pid"
 
 depend() {
   need net
@@ -22,7 +22,7 @@ start() {
   ebegin "Starting $desc"
   start-stop-daemon --background --start \
   --exec $command \
-  --make-pidfile --pidfile /var/run/$pkg.pid \
+  --make-pidfile --pidfile $pidfile \
   -1 /var/log/lora/$pkg.log \
   -2 /var/log/lora/$pkg.errors
   eend $?
@@ -31,17 +31,20 @@ start() {
 stop() {
   ebegin "Stopping $desc"
   start-stop-daemon --stop \
-  -x $command \
-  --pidfile /var/run/$pkg.pid
+  --exec $command \
+  --pidfile $pidfile
   eend $?
 }
 
 restart() {
   ebegin "Restarting $desc"
-  start-stop-daemon --stop -x $command --pidfile /var/run/$pkg.pid --retry 30
+  start-stop-daemon --stop \
+  --exec $command --retry 30 \
+  --pidfile /var/run/$pkg.pid
+
   start-stop-daemon --background --start \
   --exec $command \
-  --make-pidfile --pidfile /var/run/$pkg.pid \
+  --make-pidfile --pidfile $pidfile \
   -1 /var/log/lora/$pkg.log \
   -2 /var/log/lora/$pkg.errors
   eend $?

@@ -2,12 +2,12 @@
 # Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 pkgname=lora-gateway
 pkgver=3.2.1
-pkgrel=0
+pkgrel=1
 pkgdesc="Driver/HAL to build a LoRa gateway using a Semtech SX1301 modem"
 url="https://github.com/Lora-net/lora_gateway"
 arch="armhf"
 license="custom"
-depends=""
+depends="musl"
 #makedepends="linux-rpi2-dev linux-rpi-dev"
 makedepends="linux-headers"
 install="$pkgname-dev.post-install $pkgname-dev.pre-deinstall"

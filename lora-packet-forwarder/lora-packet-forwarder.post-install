@@ -1,4 +1,3 @@
 #!/bin/sh
 
-# add something which happends after install
-
+/usr/sbin/reset_pkt_fwd start /usr/sbin/basic_pkt_fwd/local_conf.json
