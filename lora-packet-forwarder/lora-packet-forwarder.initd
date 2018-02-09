@@ -56,7 +56,7 @@ restart() {
 status() {
 	ebegin "Status for $desc:"
 	if [ -f $pidfile ]; then
-        ps -ef $(cat $pidfile)
+        ps -efq $(cat $pidfile)
         RETVAL=$?
     else
         echo "$name is not running"

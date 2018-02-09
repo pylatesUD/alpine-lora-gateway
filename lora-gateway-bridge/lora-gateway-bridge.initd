@@ -23,8 +23,8 @@ start() {
   start-stop-daemon --background --start \
   --exec $command \
   --make-pidfile --pidfile $pidfile \
-  -1 /var/log/lora/$pkg.log \
-  -2 /var/log/lora/$pkg.errors
+  -1 /var/log/$pkg.log \
+  -2 /var/log/$pkg.errors
   eend $?
 }
 
@@ -45,15 +45,15 @@ restart() {
   start-stop-daemon --background --start \
   --exec $command \
   --make-pidfile --pidfile $pidfile \
-  -1 /var/log/lora/$pkg.log \
-  -2 /var/log/lora/$pkg.errors
+  -1 /var/log/$pkg.log \
+  -2 /var/log/$pkg.errors
   eend $?
 }
 
 status() {
 	ebegin "Status for $desc:"
 	if [ -f $pidfile ]; then
-        ps -ef $(cat $pidfile)
+        ps -efq $(cat $pidfile)
         RETVAL=$?
     else
         echo "$name is not running"
