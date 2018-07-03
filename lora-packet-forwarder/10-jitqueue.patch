@@ -1,0 +1,14 @@
+--- lora_pkt_fwd/src/jitqueue.c
++++ lora_pkt_fwd/src/jitqueue.c.new
+@@ -18,6 +18,11 @@
+ 
+ #define _GNU_SOURCE     /* needed for qsort_r to be defined */
+ #include <stdlib.h>     /* qsort_r */
++
++#ifdef NO_QSORT_R
++#include "sort.h"
++#endif
++
+ #include <stdio.h>      /* printf, fprintf, snprintf, fopen, fputs */
+ #include <string.h>     /* memset, memcpy */
+ #include <pthread.h>

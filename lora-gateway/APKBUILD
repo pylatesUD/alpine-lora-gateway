@@ -1,22 +1,27 @@
 # Contributor: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 # Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 pkgname=lora-gateway
-pkgver=3.2.1
+pkgver=5.0.1
 pkgrel=1
 pkgdesc="Driver/HAL to build a LoRa gateway using a Semtech SX1301 modem"
 url="https://github.com/Lora-net/lora_gateway"
 arch="armhf"
 license="custom"
-depends="musl"
+depends=""
 #makedepends="linux-rpi2-dev linux-rpi-dev"
 makedepends="linux-headers"
 install="$pkgname-dev.post-install $pkgname-dev.pre-deinstall"
 subpackages="$pkgname-dev $pkgname-doc"
 source="
 	${pkgname}-${pkgver}.tar.gz::https://github.com/Lora-net/${pkgname/-/_}/archive/v${pkgver}.tar.gz
+	10-reset_lgw.patch
 	"
 builddir="$srcdir/"
 options="!check"
+
+prepare() {
+	patch "$builddir/${pkgname/-/_}-$pkgver/reset_lgw.sh" < 10-reset_lgw.patch
+}
 
 build() {
 	cd "$builddir/${pkgname/-/_}-$pkgver/"
@@ -40,13 +45,13 @@ package() {
 	install -m644 -D ./libloragw/libloragw.a "$pkgdir"/usr/lib/$pkgname/libloragw/libloragw.a
 
 	mkdir -p "$pkgdir"/usr/sbin
-	#install -m755 -D ./reset_lgw.sh "$pkgdir"/usr/bin/reset_lgw
 	install -m755 -D ./util_pkt_logger/util_pkt_logger "$pkgdir"/usr/sbin/
 	install -m755 -D ./util_spi_stress/util_spi_stress "$pkgdir"/usr/sbin/
 	install -m755 -D ./util_tx_test/util_tx_test "$pkgdir"/usr/sbin/
 	#install -m755 -D ./util_lbt_test/util_lbt_test "$pkgdir"/usr/sbin/
 	install -m755 -D ./util_spectral_scan/util_spectral_scan "$pkgdir"/usr/sbin/
 	install -m755 -D ./util_tx_continuous/util_tx_continuous "$pkgdir"/usr/sbin/
+        install -m755 -D ./reset_lgw.sh "$pkgdir"/usr/sbin/reset_lgw
 
 	install -m755 -D ./libloragw/test_loragw_cal "$pkgdir"/usr/sbin/
 	install -m755 -D ./libloragw/test_loragw_hal "$pkgdir"/usr/sbin/
@@ -62,4 +67,5 @@ package() {
 	install -m644 -D "$builddir"/${pkgname/-/_}-$pkgver/libloragw/inc/config.h "$pkgdir"/usr/include/$pkgname/libloragw/inc/config.h
 }
 
-sha512sums="8217e5ab1d949d9ef387488763643eb104489a60c922177d36fef1482507377aee44d344eab2f5b5091077982b6739bb5e32221f5a818c7e596c073c3810caac  lora-gateway-3.2.1.tar.gz"
+sha512sums="1926d2ab2d37c25d0d0244fcf084021cd94f9ad76d5d1ffdca37938ee3fefc199696f549f72d24a4d22ba516ccdb1e28188b54168e05891f6f92cba7edb5381d  lora-gateway-5.0.1.tar.gz
+e7f0d1b61a073462294cc7d846c7037293dc60f08d575e1f900682c3c7783dec765cf219a1ff3e7010b89fbca6a784e796be776fb7497bd8e1a747578e3ea680  10-reset_lgw.patch"

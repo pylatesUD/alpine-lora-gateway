@@ -1,32 +1,42 @@
 # Contributor: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 # Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
-## TODO: actualize to the latest build when they changes non-standard qsort_r with qsort in lora_pkt_fwd/src/jitqueue.c
 
 pkgname=lora-packet-forwarder
 altname=packet-forwarder
-pkgver=2.2.1
+pkgver=4.0.1
 pkgrel=1
 pkgdesc="a program for a LoRa gateway that forwards packets received to a server and emits packets that are sent by the server."
 url="https://github.com/Lora-net/packet_forwarder"
 arch="armhf"
 license="custom"
-depends="lora-gateway-dev musl"
-makedepends=""
+depends="lora-gateway"
+makedepends="lora-gateway-dev"
 install="$pkgname.pre-install $pkgname.post-install"
 subpackages="$pkgname-dev $pkgname-doc"
 source="
         ${pkgname}-${pkgver}.tar.gz::https://github.com/Lora-net/packet_forwarder/archive/v$pkgver.tar.gz
 	10-makefile.patch
+	10-makefile2.patch
+	10-jitqueue.patch
+	sort.h
+	sort.c
 	10-reset_pkt_fwd.patch
-	lora-packet-forwarder.initd
-	lora-packet-forwarder.confd
+	${pkgname}.initd
+	${pkgname}.confd
 	"
 builddir="$srcdir/"
 options="!check"
 
 prepare() {
-	patch "$builddir"/${altname/-/_}-${pkgver}/Makefile < 10-makefile.patch
-        patch "$builddir"/${altname/-/_}-${pkgver}/reset_pkt_fwd.sh < 10-reset_pkt_fwd.patch
+	dir="$builddir"/${altname/-/_}-${pkgver}
+	patch "$dir"/Makefile < 10-makefile.patch
+
+	## For qsort_r in musl:
+	patch "$dir"/lora_pkt_fwd/Makefile < 10-makefile2.patch
+	patch "$dir"/lora_pkt_fwd/src/jitqueue.c < 10-jitqueue.patch
+
+        cp sort.h "$dir"/lora_pkt_fwd/inc/
+	cp sort.c "$dir"/lora_pkt_fwd/src/
 }
 build() {
 	cd "$builddir"/${altname/-/_}-${pkgver}/
@@ -50,27 +60,15 @@ package() {
 	install -Dm644 PROTOCOL.TXT "$pkgdir"/usr/share/doc/$pkgname/PROTOCOL.TXT
 	rm PROTOCOL.TXT
 
-	install -m555 -D ./reset_pkt_fwd.sh "$pkgdir"/usr/sbin/reset_pkt_fwd
 	install -m555 -D ./util_ack/util_ack "$pkgdir"/usr/sbin/util_packet_forwarder_ack
 	install -m555 -D ./util_sink/util_sink "$pkgdir"/usr/sbin/util_packet_forwarder_sink
 	install -m555 -D ./util_tx_test/util_tx_test "$pkgdir"/usr/sbin/util_packet_forwarder_tx_test
 
-	cd basic_pkt_fwd
-	install -m555 -D basic_pkt_fwd   "$pkgdir"/usr/sbin/basic_pkt_fwd/basic_pkt_fwd
-	install -m644 -D  global_conf.json local_conf.json "$pkgdir"/usr/sbin/basic_pkt_fwd/
-	cp -r cfg "$pkgdir"/usr/sbin/basic_pkt_fwd/
-	cd ..
-
-	cd beacon_pkt_fwd
-	install -m555 -D beacon_pkt_fwd   "$pkgdir"/usr/sbin/beacon_pkt_fwd/beacon_pkt_fwd
-	install -m644 -D  global_conf.json local_conf.json "$pkgdir"/usr/sbin/beacon_pkt_fwd/
-	cp -r cfg "$pkgdir"/usr/sbin/beacon_pkt_fwd/
-	cd ..
-
-	cd gps_pkt_fwd
-	install -m555 -D gps_pkt_fwd   "$pkgdir"/usr/sbin/gps_pkt_fwd/gps_pkt_fwd
-	install -m644 -D  global_conf.json local_conf.json "$pkgdir"/usr/sbin/gps_pkt_fwd/
-	cp -r cfg "$pkgdir"/usr/sbin/gps_pkt_fwd/
+	cd lora_pkt_fwd
+	install -m555 -D lora_pkt_fwd   "$pkgdir"/usr/sbin/lora_pkt_fwd/lora_pkt_fwd
+	install -m555 -D update_gwid.sh "$pkgdir"/usr/sbin/lora_pkt_fwd/update_gwid
+	install -m644 -D global_conf.json local_conf.json "$pkgdir"/usr/sbin/lora_pkt_fwd/
+	cp -r cfg "$pkgdir"/usr/sbin/lora_pkt_fwd/
 	cd ..
 
 	make clean 
@@ -81,8 +79,12 @@ package() {
 		"$pkgdir"/etc/conf.d/$pkgname
 }
 
-sha512sums="917abb284e885d63aeeefdcaa9097943d9713e20fefbd5205b23b0a3d62ad65e73f5de9f8179fe5084922ac3b14dfc9c0156eff962859644b5c43faff1af07ea  lora-packet-forwarder-2.2.1.tar.gz
+sha512sums="edf5bb4189b67dc344be2a14d8eaee7c5bc5167ad010f9dcfc741504c59bad1d03449a4ce55864a0123f426939470a5cc489b956259547366e84973b5b2ff1b4  lora-packet-forwarder-4.0.1.tar.gz
 ec3b112a6748cf3919264c814605f8b077a1d7984d491ce44e08fe251ea5cf8e5dfcf320a6db3a4145adc91acd52a5d4b68f9e72244f369409a2abaa522208e5  10-makefile.patch
+848b8540ca3643d889d42e82155b7b3035299afcb5cd6081344fe81e2e7d61291e47d03aab24d55c03a9c17ef3c810080b182bae30c7ce96afad519fd95ee5ad  10-makefile2.patch
+a2ccbf475ff194bea17ab993fbc4790755d2fde6887fac2425cd1998adf13449c7fbfc045e34785748d70e42aaf3ea6b9a9a23c65a818817579890da557ceef9  10-jitqueue.patch
+09d736c704e25739e993909322ca647f32c5ce324e39fad726e3dd259a32c359a6ddb2ad6a51436c9b1438092db6a0d5838cb83d68ba69514bf8bc2e040877af  sort.h
+6bec4ef8a0fef2607adb9e8f300b61b99d5ab83ce92d3834ed2dfb943c49a0fbe72af7f0dbb06b16be37fa5adbb12dbaf02980a38409f4c46d0453c40b084363  sort.c
 42f9e7bb5bab186ce071dba980a6fcb2a7c1724c64672e81db33542ef6b7c948044e24c282cc4dbaf45f328588a78afc0509a74f329ca321d469541ec77a2076  10-reset_pkt_fwd.patch
-e228cdb0fbcdb33055d116bf7129557b6fc66ea2b14a08c4f8056fc79d3097b7946d3746b4d7d4ed1f619342b0e1f174cd5e14ec8190e13d1e83a5be76e74693  lora-packet-forwarder.initd
+992baacb1f4fc29cd38d25b5cefcbe039242533470581eb95ec4d97e943ed832e8c89d2f90a1962e10d541f5b4dd4de7e8a9be37a7beb17eb2048f92ce1c9719  lora-packet-forwarder.initd
 f11f0d192cd7823307c2ce4ddc7b3fff5190f72d3f65a5524b487021a95a222aca1fd36ab1eb58ed533e7acd555bfb70f0c8a13db20338ea31527f3151fd2bd7  lora-packet-forwarder.confd"

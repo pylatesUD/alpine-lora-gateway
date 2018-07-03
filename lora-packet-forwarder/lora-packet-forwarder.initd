@@ -3,11 +3,13 @@
 # Copyright 2018 Sebastian Tabares
 # Distributed under the terms of the GNU General Public License v3
 # $Header: $
-name=basic_pkt_fwd
+name=lora_pkt_fwd
 desc="Packet Forwarder"
 pkg=packet-forwarder
-dir="/usr/sbin/$name/"
+dir="/usr/sbin/$name"
 command="$name"
+#reset_lgw="/usr/sbin/reset_lgw"
+pin=7
 #command_args="$sample_opts"
 #command_background="yes"
 
@@ -23,6 +25,7 @@ depend() {
 
 start() {
   ebegin "Starting $desc"
+  reset_lgw start $pin
   start-stop-daemon --background --start \
   --exec ./$command \
   --make-pidfile --pidfile $pidfile \
@@ -33,6 +36,7 @@ start() {
 
 stop() {
   ebegin "Stopping $desc"
+  reset_lgw stop $pin
   start-stop-daemon --stop \
   -x ./$command \
   --pidfile $pidfile
@@ -41,10 +45,12 @@ stop() {
 
 restart() {
   ebegin "Restarting $desc"
+  reset_lgw stop $pin
   start-stop-daemon --stop \
   --exec ./$command --retry 30 \
   --pidfile $pidfile
 
+  reset_lgw start $pin
   start-stop-daemon --background --start \
   --exec ./$command \
   --make-pidfile --pidfile $pidfile \

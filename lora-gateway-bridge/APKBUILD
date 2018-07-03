@@ -1,20 +1,22 @@
 # Contributor: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 # Maintainer: Sebastian Yesid Tabares Amaya  <sytabaresa@gmail.com>
 pkgname=lora-gateway-bridge
-pkgver=2.2.0
+pkgver=2.4.1
 pkgrel=1
 pkgdesc="LoRa Gateway Bridge abstracts the packet_forwarder protocol into JSON over MQTT"
 url="https://docs.loraserver.io/lora-gateway-bridge/overview/"
 arch="armhf"
+_arch="armv6"
 license="MIT"
 depends=""
 makedepends=""
 install="$pkgname.pre-install $pkgname.post-install"
 #subpackages="$pkgname-dev $pkgname-doc"
 source="
-	https://github.com/brocaar/${pkgname}/releases/download/$pkgver/${pkgname//-/_}_${pkgver}_linux_arm.tar.gz
-	lora-gateway-bridge.initd
-	lora-gateway-bridge.confd
+	https://artifacts.loraserver.io/downloads/${pkgname}/${pkgname}_${pkgver}_linux_${_arch}.tar.gz
+	${pkgname}.initd
+	${pkgname}.confd
+	${pkgname}.toml
 	"
 builddir="$srcdir/"
 options="!check"
@@ -33,8 +35,11 @@ package() {
 		"$pkgdir"/etc/init.d/$pkgname
 	install -m644 -D "$srcdir"/$pkgname.confd \
 		"$pkgdir"/etc/conf.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.toml \
+		"$pkgdir"/etc/$pkgname/$pkgname.toml
 }
 
-sha512sums="996647ba71bb026444fbae198aef19637d306f6a6662e60fdb69fa4add0edd7b0baecd1153b5f6a7b22ec1eae0bb18c775159019632c96a4036b9f0aa755122d  lora_gateway_bridge_2.2.0_linux_arm.tar.gz
+sha512sums="38a4371e4a7a737da0dcab8371b990174a21e7c1d2fb50b04e6b27da952a75e9f99d81164e49471b1ad560862bd4dcf9d5d916dc31cab5600dc61cf51ced680b  lora-gateway-bridge_2.4.1_linux_armv6.tar.gz
 7407336da3ce8e9f0a81e79fe827e0715e1671ecbc579655f8cad3441521eb6d226dc8080c99fa5775162440c5c5ce034c5b65e8c48b7d4ccd5f85fe6cd0a4bb  lora-gateway-bridge.initd
-07b14e2d5ea2860d0fe10af3554d1ce5a50ccc913d07a06290df46d8b28b663411dee4ee7375afbe473f99ac0e61393996af7ec9dd4cdf92e5f2013d24c81f6b  lora-gateway-bridge.confd"
+be688838ca8686e5c90689bf2ab585cef1137c999b48c70b92f67a5c34dc15697b5d11c982ed6d71be1e1e7f7b4e0733884aa97c3f7a339a8ed03577cf74be09  lora-gateway-bridge.confd
+96fdee0f41e6c0f52109438e6a49a9524ed2e804606f0945e8707ea1fb66e4a51c8fad61590591f7b677f8de3b247082541875c2d10da20b2c46ad2a03c90cf9  lora-gateway-bridge.toml"
