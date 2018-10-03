@@ -12,12 +12,14 @@ Se configura en el Gateway un software para redireccionamiento de paquetes LoRa 
 Seguir las indicaciones de [Instalación en Raspberry PI](https://wiki.alpinelinux.org/wiki/Raspberry_Pi), teniendo en cuenta que se debe dejar la partición FAT32 de al menos 500MB; también es recomendable usar el resto de espacio en la SD card como una partición ext4 para espacio de cache, repos, etc.
 
 ### Configuracion de Alpine Linux
-Una vez instalado Alpine Linux, se deben hacer dos procesos:
-- Configurar/colocar los archivos auxiliares de configuración externa en la partición FAT32 (/media/mmcblk0p1).
-- Crear un archivo <nombre>.apkovl.tar.gz personalizado basado en la plantilla y los scripts asociados
-- subir el archivo <nombre>.apkovl.tar.gz a la segunda particion (ext4)  cuyo nombre sería /media/mmcblk0p2 para Alpine Linux.
+Una vez instalado Alpine Linux, se deben hacer estos procesos:
+1. Configurar/colocar los archivos auxiliares de configuración externa en la partición FAT32 (/media/mmcblk0p1).
+2. Crear un archivo <nombre>.apkovl.tar.gz personalizado basado en la plantilla y los scripts asociados
+3. subir el archivo <nombre>.apkovl.tar.gz a la segunda particion (ext4)  cuyo nombre sería /media/mmcblk0p2 para Alpine Linux.
+4. Configurar el proxy (si lo hay) con el comando `$ setup-proxy` y luego importarlo en las variables de entorno locales `$ source /etc/profile.d/proxy.sh`
+5. ejecutar `$ setup-apkcache` para crear el cache local de paquetes de Alpine Linux teniendo en cuenta que en general, el cache quedará en /media/mmcblk0p2/cache
+6. Sincronizar el cache local con los repos mediante el comando `$ apk cache -v sync`.
 
 Los archivos <nombre>.apkovl.tar.gz son archivos de [*backup local de configuración*](https://wiki.alpinelinux.org/wiki/Alpine_local_backup) para que se usan para hacer mas reproducible la configuración de los gateways.
-
 
 
